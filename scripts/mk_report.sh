@@ -76,10 +76,14 @@ fi
 
 # ==== 混合场景 ====
 MIX_TXT="$OUTDIR/mix_report.txt"
-MIX_SUCC="N/A"
+MIX_RPS="N/A"; MIX_P50="N/A"; MIX_P99="N/A"; MIX_SUCC="N/A"
 if [[ -f "$MIX_TXT" ]]; then
-  MIX_SUCC="$(grep -m1 '^Success' "$MIX_TXT" | grep -oE '[0-9]+(\.[0-9]+)?%' || echo "N/A")"
+  MIX_RPS="$(grep -m1 'Requests' "$MIX_TXT" | awk '{print $8}' || echo N/A)"
+  MIX_P50="$(grep -m1 '  50%' "$MIX_TXT" | awk '{print $2}' || echo N/A)"
+  MIX_P99="$(grep -m1 '  99%' "$MIX_TXT" | awk '{print $2}' || echo N/A)"
+  MIX_SUCC="$(grep -m1 '^Success' "$MIX_TXT" | grep -oE '[0-9]+(\.[0-9]+)?%' || echo N/A)"
 fi
+
 
 # ==== DB 规模 ====
 DB_COUNT="N/A"
@@ -103,7 +107,8 @@ REPORT="$OUTDIR/REPORT.md"
   echo "| wrk GET  | ${GET_RPS} | ${GET_P50} | ${GET_P99} | Transfer/sec: ${GET_TX} |"
   echo "| wrk POST | ${POST_RPS} | ${POST_P50} | ${POST_P99} |  |"
   echo "| vegeta GET | ${VEG_RPS} | ${VEG_P50} ms | ${VEG_P99} ms | Success: ${VEG_SUCC} |"
-  echo "| vegeta MIX |  —  |  —  |  —  | Success: ${MIX_SUCC} |"
+  echo "| vegeta MIX | ${MIX_RPS} | ${MIX_P50} | ${MIX_P99} | Success: ${MIX_SUCC} |"
+
 } >"$REPORT"
 
 echo "✅ 报告已生成：$REPORT"

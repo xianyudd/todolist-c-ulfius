@@ -297,11 +297,11 @@ vegeta_mix() {
   wait
 
   if [[ -s "$getbin" || -s "$postbin" ]]; then
-    # 关键修复：report 直接用多输入文件，而不是 cat 级联，避免 gob duplicate type
+    # 正确写法：report 支持多文件
     if ! vegeta report "$getbin" "$postbin" | tee "$report"; then
       warn "vegeta mix report 失败"
     fi
-    # plot 仍可合并，但加容错
+    # plot 只能吃单一流，所以还是用 cat
     if ! cat "$getbin" "$postbin" | vegeta plot > "$html" 2>/dev/null; then
       warn "vegeta mix plot 失败"
     fi
